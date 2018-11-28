@@ -8,8 +8,8 @@ from oauth2client import file, client, tools
 SCOPES = 'https://www.googleapis.com/auth/calendar.readonly'
 
 def main():
-    """Shows basic usage of the Google Calendar API.
-    Prints the start and name of the next 10 events on the user's calendar.
+    """
+    Prints all calendar events for tomorrow
     """
     # The file token.json stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
@@ -22,10 +22,13 @@ def main():
     service = build('calendar', 'v3', http=creds.authorize(Http()))
 
     # Call the Calendar API
-    now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
-    print('Getting the upcoming 10 events')
-    events_result = service.events().list(calendarId='primary', timeMin=now,
-                                        maxResults=10, singleEvents=True,
+    tomorrow_morning = datetime.datetime.now().isoformat() + 'Z'
+    tomorrow_evening = datetime.datetime.now() + datetime.timedelta(days=2)
+    tomorrow_evening = tomorrow_evening.isoformat() + 'Z'
+
+    events_result = service.events().list(calendarId='primary', timeMin=tomorrow_morning,
+                                        timeMax=tomorrow_evening,
+                                        maxResults=5, singleEvents=True,
                                         orderBy='startTime').execute()
     events = events_result.get('items', [])
 

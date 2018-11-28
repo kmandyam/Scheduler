@@ -1,3 +1,4 @@
 auth.txt
 credentials.json
 token.json
+__pycache__/*
