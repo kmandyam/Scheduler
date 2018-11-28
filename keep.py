@@ -1,7 +1,8 @@
 import gkeepapi
 import sys
+from quickstart import get_events
 
-def create_note(keep):
+def create_note(keep, events):
     """
     Usage Example
 
@@ -10,8 +11,16 @@ def create_note(keep):
     note.color = gkeepapi.node.ColorValue.Red
     keep.sync()
     """
-    note = keep.createNote('Test Note', 'Testing Scheduler')
-    note.color = gkeepapi.node.ColorValue.Purple
+    events_list = []
+    if not events:
+        return
+    for event in events:
+        events_list.append((event['summary'], False))
+        start = event['start'].get('dateTime', event['start'].get('date'))
+
+    note = keep.createList('Schedule Note', events_list)
+    note.pinned = True
+    note.color = gkeepapi.node.ColorValue.Red
     keep.sync()
 
 
@@ -22,8 +31,8 @@ def main():
 
     keep = gkeepapi.Keep()
     success = keep.login(username, password)
-
-    create_note(keep)
+    events = get_events()
+    create_note(keep, events)
 
 if __name__ == '__main__':
     main()

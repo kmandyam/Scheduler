@@ -11,6 +11,17 @@ def main():
     """
     Prints all calendar events for tomorrow
     """
+    events = get_events()
+    if not events:
+        print('No upcoming events found.')
+    for event in events:
+        start = event['start'].get('dateTime', event['start'].get('date'))
+        print(start, event['summary'])
+
+def get_events():
+    """
+    Returns a list of a calendar events for tomorrow
+    """
     # The file token.json stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
     # time.
@@ -22,8 +33,8 @@ def main():
     service = build('calendar', 'v3', http=creds.authorize(Http()))
 
     # Call the Calendar API
-    tomorrow_morning = datetime.datetime.now().isoformat() + 'Z'
-    tomorrow_evening = datetime.datetime.now() + datetime.timedelta(days=2)
+    tomorrow_morning = datetime.datetime.utcnow().isoformat() + 'Z'
+    tomorrow_evening = datetime.datetime.utcnow() + datetime.timedelta(days=1)
     tomorrow_evening = tomorrow_evening.isoformat() + 'Z'
 
     events_result = service.events().list(calendarId='primary', timeMin=tomorrow_morning,
@@ -31,12 +42,7 @@ def main():
                                         maxResults=5, singleEvents=True,
                                         orderBy='startTime').execute()
     events = events_result.get('items', [])
-
-    if not events:
-        print('No upcoming events found.')
-    for event in events:
-        start = event['start'].get('dateTime', event['start'].get('date'))
-        print(start, event['summary'])
+    return events
 
 if __name__ == '__main__':
     main()
